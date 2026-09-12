@@ -24,7 +24,7 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
 
         assert.deepEqual(result, { a: 1 }, 'Отсутствующие ключи должны быть проигнорированы');
     });
-    QUnit.test("Работает правильно, если поля имеют значение false", (assert) => {
+    QUnit.test("Проверка, если поля имеют значение false", (assert) => {
         const origin = {a: false, b: true, c:0};
         const keys = ["a", "b", "c"];
 
@@ -32,7 +32,7 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         assert.deepEqual(result, origin, "Ключи, которые имеют значение false должны присутствовать");
     });
     QUnit.test("Проверка, что происходит глубокое копирование", (assert) => {
-        let origin = {stat: 200, data: {msg: "hello", value: 125}};
+        const origin = {stat: 200, data: {msg: "hello", value: 125}};
         const keys = ["data"];
 
         const result = filterObjectByKeys(origin, keys);
@@ -61,7 +61,7 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         const result = filterObjectByKeys(origin, keys);
         assert.deepEqual(result, {}, "Из пустого объекта должен быть пустой");
     });
-    QUnit.test("Проверка, на не соответствие типов аргументов", (assert) => {
+    QUnit.test("Проверка на не соответствие типов аргументов", (assert) => {
         const origin = {a: 1, b: 2, c: 3};
         const keys = ["a", "b", "c"];
 
@@ -71,5 +71,22 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         result = filterObjectByKeys("its_string", keys);
 
         assert.deepEqual(result, {}, "Из не объекта невозможно получить объект");
+    });
+    QUnit.test("Проверка на Object.create(null)", (assert) => {
+        const origin = Object.create(null);
+        const keys = ["a", "k"];
+
+        const result = filterObjectByKeys(origin, keys);
+
+        assert.deepEqual(result, Object.create(null), "null не содержит полей");
+    });
+    QUnit.test("Проверка, если объект содержит hasOwnProperty", (assert) => {
+        const origin = {hasOwnProperty: 1, a: 5};
+
+        let result = filterObjectByKeys(origin, ["a"]);
+        assert.deepEqual(result, {a: 5}, "hasOwnProperty поле не функция");
+
+        result = filterObjectByKeys(origin, ["hasOwnProperty"]);
+        assert.deepEqual(result, {hasOwnProperty: 1}, "Извлечение hasOwnProperty");
     });
 });
