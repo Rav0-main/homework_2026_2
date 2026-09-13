@@ -111,4 +111,13 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         assert.deepEqual(origin, {1: 5, a: 7, c: null}, "Первый аргумент не должен изменяться");
         assert.deepEqual(keys, ["a", 1], "Второй аргумент не должен изменяться");
     });
+    QUnit.test("Проверка, что __proto__ тоже копируется как поле", (assert) => {
+        const origin = {a: 1, "__proto__": {c: "P"}};
+        const keys = ["__proto__"];
+
+        const result = filterObjectByKeys(origin, keys);
+        const answer = Object.create(null);
+        answer.__proto__ = {c: "P"};
+        assert.deepEqual(result, answer, "__proto__ тоже нужно копировать");
+    });
 });

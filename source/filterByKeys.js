@@ -46,7 +46,7 @@ function filterObjectByKeys(obj, keys) {
     } else if (!Array.isArray(keys)) {
         return {};
     }
-    const filteredObj = {};
+    const filteredObj = Object.create(null);
     keys.forEach((key) => {
         if (key in obj) {
             try {
