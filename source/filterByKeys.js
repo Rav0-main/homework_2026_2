@@ -24,26 +24,25 @@
  *  // filteredObj = {"key1": 1, "key_string": "any_string", "key3": 3}
 */
 function filterObjectByKeys(obj, keys) {
-  if (typeof obj !== "object") {
-    return {};
-  } else if (!Array.isArray(keys)) {
-    return {};
-  }
-  const filteredObj = {};
-  keys.forEach((key) => {
-    if (key in obj) {
-      try {
-        filteredObj[key] = structuredClone(obj[key]);
-      }
-      catch (err) {
-        if (err.name !== "DataCloneError") {
-          throw err;
-        }
-        // Если поле не копируемо, то сохраняем ссылку
-        filteredObj[key] = obj[key];
-      }
+    if (typeof obj !== "object") {
+        return {};
+    } else if (!Array.isArray(keys)) {
+        return {};
     }
-  });
+    const filteredObj = {};
+    keys.forEach((key) => {
+        if (key in obj) {
+            try {
+                filteredObj[key] = structuredClone(obj[key]);
+            } catch (err) {
+                if (err.name !== "DataCloneError") {
+                    throw err;
+                }
+                // Если поле не копируемо, то сохраняем ссылку
+                filteredObj[key] = obj[key];
+            }
+        }
+    });
 
-  return filteredObj;
+    return filteredObj;
 }
