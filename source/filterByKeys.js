@@ -46,11 +46,16 @@ function filterObjectByKeys(obj, keys) {
     } else if (!Array.isArray(keys)) {
         return {};
     }
+    // нужно ли эта "оптимизация"?
+    const keysWas = new Set();
     const filteredObj = Object.create(null);
     keys.forEach((key) => {
         if (key in obj) {
             try {
-                filteredObj[key] = structuredClone(obj[key]);
+                if (!keysWas.has(key)) {
+                    filteredObj[key] = structuredClone(obj[key]);
+                    keysWas.add(key);
+                }
             } catch (err) {
                 if (err.name !== "DataCloneError") {
                     throw err;

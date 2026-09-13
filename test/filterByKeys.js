@@ -120,4 +120,21 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         answer.__proto__ = {c: "P"};
         assert.deepEqual(result, answer, "__proto__ тоже нужно копировать");
     });
+    QUnit.test("Проверка на копировании множество тяжелых объектов за нормальное время", (assert) => {
+        const origin = {els: Array.from(
+            { length: 100 },
+            (v, index) => ({
+                id: index,
+                value: Array.from(
+                    {length: 100},
+                    (v, index) => ({
+                        id: index
+                    }))
+            })
+        )};
+        const keys = Array.from({length: 100_000}, (v, index) => "els");
+
+        const result = filterObjectByKeys(origin, keys);
+        assert.deepEqual(result, origin, "Должен отметать одинаковые ключи и при этом выполняться относительно быстро");
+    })
 });
