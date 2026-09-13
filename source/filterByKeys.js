@@ -39,7 +39,9 @@
  * // filteredObj = {};
 */
 function filterObjectByKeys(obj, keys) {
-    if (typeof obj !== "object") {
+    if (obj === null) {
+        return {};
+    } else if (typeof obj !== "object") {
         return {};
     } else if (!Array.isArray(keys)) {
         return {};

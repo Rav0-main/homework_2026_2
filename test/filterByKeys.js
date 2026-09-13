@@ -69,8 +69,10 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         assert.deepEqual(result, {}, "Из не массива не понятно, какие должны быть поля");
         
         result = filterObjectByKeys("its_string", keys);
-
         assert.deepEqual(result, {}, "Из не объекта невозможно получить объект");
+
+        result = filterObjectByKeys(null, keys);
+        assert.deepEqual(result, {}, "Из null невозможно получить объект");
     });
     QUnit.test("Проверка на Object.create(null)", (assert) => {
         const origin = Object.create(null);
@@ -78,7 +80,7 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
 
         const result = filterObjectByKeys(origin, keys);
 
-        assert.deepEqual(result, Object.create(null), "null не содержит полей");
+        assert.deepEqual(result, {}, "Object.create(null) не содержит полей");
     });
     QUnit.test("Проверка, если объект содержит hasOwnProperty", (assert) => {
         const origin = {hasOwnProperty: 1, a: 5};
@@ -87,7 +89,7 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         assert.deepEqual(result, {a: 5}, "hasOwnProperty поле не функция");
 
         result = filterObjectByKeys(origin, ["hasOwnProperty"]);
-        assert.deepEqual(result, {hasOwnProperty: 1}, "Извлечение hasOwnProperty");
+        assert.deepEqual(result, {hasOwnProperty: 1}, "hasOwnProperty должен копироваться, даже если он переопределен");
     });
     QUnit.test("Проверка, если в поле содержится некопируемый объект", (assert) => {
         const funct = () => console.log("It's function!");
@@ -95,9 +97,18 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         const origin = {f: funct, a: 2, w: weakSet};
 
         let result = filterObjectByKeys(origin, ["f"]);
-        assert.deepEqual(result, {f: funct}, "Извлечение поля-функции");
+        assert.deepEqual(result, {f: funct}, "Поле-функция должна копироваться по ссылке");
 
         result = filterObjectByKeys(origin, ["f", "w"]);
         assert.deepEqual(result, {f: funct, w: weakSet});
-    })
+    });
+    QUnit.test("Проверка, что тест не изменяет аргументы", (assert) => {
+        const origin = {1: 5, a: 7, c: null};
+        const keys = ["a", 1];
+
+        filterObjectByKeys(origin, keys);
+
+        assert.deepEqual(origin, {1: 5, a: 7, c: null}, "Первый аргумент не должен изменяться");
+        assert.deepEqual(keys, ["a", 1], "Второй аргумент не должен изменяться");
+    });
 });
