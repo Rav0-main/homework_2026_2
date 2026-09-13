@@ -89,4 +89,15 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         result = filterObjectByKeys(origin, ["hasOwnProperty"]);
         assert.deepEqual(result, {hasOwnProperty: 1}, "Извлечение hasOwnProperty");
     });
+    QUnit.test("Проверка, если в поле содержится некопируемый объект", (assert) => {
+        const funct = () => console.log("It's function!");
+        const weakSet = new WeakSet([funct, funct, funct]);
+        const origin = {f: funct, a: 2, w: weakSet};
+
+        let result = filterObjectByKeys(origin, ["f"]);
+        assert.deepEqual(result, {f: funct}, "Извлечение поля-функции");
+
+        result = filterObjectByKeys(origin, ["f", "w"]);
+        assert.deepEqual(result, {f: funct, w: weakSet});
+    })
 });
