@@ -50,7 +50,7 @@ function filterObjectByKeys(obj, keys) {
     const keysWas = new Set();
     const filteredObj = Object.create(null);
     keys.forEach((key) => {
-        if (key in obj) {
+        if (Object.hasOwn(obj, key)) {
             try {
                 if (!keysWas.has(key)) {
                     filteredObj[key] = structuredClone(obj[key]);

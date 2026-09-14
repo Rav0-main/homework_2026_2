@@ -82,16 +82,19 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
 
         assert.deepEqual(result, {}, "Object.create(null) не содержит полей");
     });
-    QUnit.test("Проверка, если объект содержит hasOwnProperty", (assert) => {
-        const origin = {hasOwnProperty: 1, a: 5};
+    QUnit.test("Проверка, если объект содержит hasOwnProperty/hasOwn", (assert) => {
+        const origin = {hasOwnProperty: 1, a: 5, hasOwn: "STR"};
 
         let result = filterObjectByKeys(origin, ["a"]);
         assert.deepEqual(result, {a: 5}, "hasOwnProperty поле не функция");
 
         result = filterObjectByKeys(origin, ["hasOwnProperty"]);
         assert.deepEqual(result, {hasOwnProperty: 1}, "hasOwnProperty должен копироваться, даже если он переопределен");
+
+        result = filterObjectByKeys(origin, ["hasOwn"]);
+        assert.deepEqual(result, {hasOwn: "STR"}, "hasOwn должен копироваться, даже если он переопределен");
     });
-    QUnit.test("Проверка, если в поле содержится некопируемый объект", (assert) => {
+    QUnit.test("Проверка, если объект содержит некопируемый structuredClone объект", (assert) => {
         const funct = () => console.log("It's function!");
         const weakSet = new WeakSet([funct, funct, funct]);
         const origin = {f: funct, a: 2, w: weakSet};
@@ -100,9 +103,9 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         assert.deepEqual(result, {f: funct}, "Поле-функция должна копироваться по ссылке");
 
         result = filterObjectByKeys(origin, ["f", "w"]);
-        assert.deepEqual(result, {f: funct, w: weakSet});
+        assert.deepEqual(result, {f: funct, w: weakSet}, "Не только функции должны копироваться по ссылке");
     });
-    QUnit.test("Проверка, что тест не изменяет аргументы", (assert) => {
+    QUnit.test("Проверка, что функция не изменяет аргументы", (assert) => {
         const origin = {1: 5, a: 7, c: null};
         const keys = ["a", 1];
 
@@ -112,12 +115,11 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         assert.deepEqual(keys, ["a", 1], "Второй аргумент не должен изменяться");
     });
     QUnit.test("Проверка, что __proto__ тоже копируется как поле", (assert) => {
-        const origin = {a: 1, "__proto__": {c: "P"}};
+        const origin = JSON.parse('{"__proto__":{"a":1}}');
         const keys = ["__proto__"];
 
         const result = filterObjectByKeys(origin, keys);
-        const answer = Object.create(null);
-        answer.__proto__ = {c: "P"};
+        const answer = JSON.parse('{"__proto__":{"a":1}}');
         assert.deepEqual(result, answer, "__proto__ тоже нужно копировать");
     });
     QUnit.test("Проверка на копировании множество тяжелых объектов за нормальное время", (assert) => {
@@ -136,5 +138,13 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
 
         const result = filterObjectByKeys(origin, keys);
         assert.deepEqual(result, origin, "Должен отметать одинаковые ключи и при этом выполняться относительно быстро");
-    })
+    });
+    QUnit.test("Проверка, что поля прототипа не попадают в результат работы", (assert) => {
+        const origin = Object.create({a: 1});
+        const keys = ["a"];
+
+        const result = filterObjectByKeys(origin, keys);
+
+        assert.deepEqual(result, {}, "Поля прототипа не должны попадать в результат");
+    });
 });
