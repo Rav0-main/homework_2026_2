@@ -121,6 +121,10 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         const result = filterObjectByKeys(origin, keys);
         const answer = JSON.parse('{"__proto__":{"a":1}}');
         assert.deepEqual(result, answer, "__proto__ тоже нужно копировать");
+        assert.deepEqual(
+            Object.getPrototypeOf(result), null,
+            "У JSON.parse('{\"__proto__\":{\"a\":1}}') должен быть прототип null"
+        );
     });
     QUnit.test("Проверка на копировании множество тяжелых объектов за нормальное время", (assert) => {
         const origin = {els: Array.from(
