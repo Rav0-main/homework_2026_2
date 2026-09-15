@@ -95,6 +95,10 @@ QUnit.module('Тестируем функцию filterObjectByKeys', () => {
         assert.deepEqual(result, {hasOwn: "STR"}, "hasOwn должен копироваться, даже если он переопределен");
     });
     QUnit.test("Проверка, если объект содержит некопируемый structuredClone объект", (assert) => {
+        /**
+         * Вывод в текст "It's function!" в консоль.
+         * @returns {void}
+        */
         const funct = () => console.log("It's function!");
         const weakSet = new WeakSet([funct, funct, funct]);
         const origin = {f: funct, a: 2, w: weakSet};

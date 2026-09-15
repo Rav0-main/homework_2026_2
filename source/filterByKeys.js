@@ -38,7 +38,7 @@
  * const filteredObj = filterObjectByKeys("STRING", 123456);
  * // filteredObj = {};
 */
-function filterObjectByKeys(obj, keys) {
+const filterObjectByKeys = (obj, keys) => {
     if (obj === null) {
         return {};
     } else if (typeof obj !== "object") {
